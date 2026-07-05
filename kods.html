@@ -1,0 +1,593 @@
+<!doctype html>
+<html lang="lv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inčukalna bibliotēka</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Source+Sans+3:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --parchment:#F1E8D6;
+    --parchment-deep:#E6D9BC;
+    --card:#FBF6EA;
+    --ink:#2A2417;
+    --ink-soft:#5C543F;
+    --pine:#2E4633;
+    --pine-deep:#1E2F23;
+    --sand:#C89A5B;
+    --rust:#AE5A2C;
+    --rust-deep:#7E3E1D;
+    --line: rgba(42,36,23,.24);
+    --shadow: 0 1px 0 rgba(42,36,23,.06), 0 8px 24px -12px rgba(42,36,23,.28);
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--parchment);
+    color:var(--ink);
+    font-family:"Source Sans 3", sans-serif;
+    font-size:17px;
+    line-height:1.55;
+  }
+  h1,h2,h3{
+    font-family:"Fraunces", serif;
+    font-weight:600;
+    margin:0;
+    color:var(--ink);
+  }
+  .eyebrow{
+    font-family:"Space Mono", monospace;
+    text-transform:uppercase;
+    letter-spacing:.14em;
+    font-size:.72rem;
+    color:var(--rust-deep);
+    display:inline-flex;
+    align-items:center;
+    gap:.5em;
+  }
+  .eyebrow::before{
+    content:"";
+    width:18px; height:1px;
+    background:var(--rust-deep);
+    display:inline-block;
+  }
+  a{color:inherit;}
+  img,svg{display:block;max-width:100%;}
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+    *{animation-duration:.001s !important; transition-duration:.001s !important;}
+  }
+
+  /* ---------- Header ---------- */
+  .site-header{
+    position:sticky; top:0; z-index:50;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:.9rem clamp(1.2rem,4vw,3rem);
+    background:rgba(241,232,214,.88);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+  }
+  .brand{
+    display:flex; align-items:center; gap:.65rem;
+    font-family:"Fraunces", serif; font-weight:600; font-size:1.15rem;
+    text-decoration:none; color:var(--ink);
+  }
+  .brand-mark{width:34px;height:34px;flex:none;}
+  .main-nav{display:flex; align-items:center; gap:clamp(1rem,2.4vw,2.1rem);}
+  .main-nav a{
+    text-decoration:none;
+    font-size:.92rem; font-weight:600;
+    color:var(--ink-soft);
+    position:relative;
+    padding:.3rem .1rem;
+  }
+  .main-nav a::after{
+    content:"";
+    position:absolute; left:0; right:0; bottom:-2px;
+    height:2px; background:var(--rust);
+    transform:scaleX(0); transform-origin:left;
+    transition:transform .25s ease;
+  }
+  .main-nav a:hover::after, .main-nav a.active::after{transform:scaleX(1);}
+  .nav-toggle{
+    display:none; background:none; border:1px solid var(--line);
+    border-radius:6px; width:40px; height:40px; cursor:pointer;
+    align-items:center; justify-content:center;
+  }
+  .nav-toggle span, .nav-toggle span::before, .nav-toggle span::after{
+    content:""; display:block; width:18px; height:2px; background:var(--ink);
+    position:relative; transition:.2s;
+  }
+  .nav-toggle span::before{position:absolute; top:-6px;}
+  .nav-toggle span::after{position:absolute; top:6px;}
+
+  @media (max-width:820px){
+    .main-nav{
+      position:fixed; inset:60px 0 auto 0;
+      background:var(--parchment); flex-direction:column;
+      align-items:flex-start; padding:1.2rem 1.5rem 1.6rem;
+      border-bottom:1px solid var(--line);
+      transform:translateY(-8px); opacity:0; pointer-events:none;
+      transition:.2s ease;
+    }
+    .main-nav.open{transform:translateY(0); opacity:1; pointer-events:auto;}
+    .nav-toggle{display:inline-flex;}
+  }
+
+  /* ---------- Hero ---------- */
+  .hero{
+    position:relative; overflow:hidden;
+    padding:clamp(3.6rem,9vw,6.5rem) clamp(1.2rem,6vw,3rem) clamp(4.5rem,10vw,7rem);
+    background:
+      repeating-linear-gradient(178deg,
+        var(--parchment) 0 90px,
+        var(--parchment-deep) 90px 134px,
+        var(--sand) 134px 168px,
+        var(--parchment-deep) 168px 214px,
+        var(--rust) 214px 232px,
+        var(--parchment) 232px 320px,
+        var(--sand) 320px 356px,
+        var(--pine-deep) 356px 372px
+      );
+  }
+  .hero::after{
+    content:"";
+    position:absolute; inset:0;
+    background-image:radial-gradient(rgba(42,36,23,.05) 1px, transparent 1px);
+    background-size:3px 3px;
+    mix-blend-mode:multiply;
+    pointer-events:none;
+  }
+  .hero-inner{position:relative; max-width:760px;}
+  .hero h1{
+    font-size:clamp(2.6rem,6vw,4.2rem);
+    line-height:1.02;
+    margin:.9rem 0 1.1rem;
+    color:var(--pine-deep);
+  }
+  .hero p.lead{
+    font-size:1.15rem; max-width:46ch; color:var(--ink-soft);
+    margin:0 0 1.8rem;
+  }
+  .hero-search{
+    display:flex; gap:.5rem; max-width:460px;
+    background:var(--card); padding:.4rem; border-radius:10px;
+    border:1px solid var(--line); box-shadow:var(--shadow);
+  }
+  .hero-search input{
+    flex:1; border:none; background:transparent; padding:.6rem .7rem;
+    font-family:"Source Sans 3", sans-serif; font-size:.98rem; color:var(--ink);
+  }
+  .hero-search input:focus{outline:none;}
+  .btn{
+    border:none; cursor:pointer; font-family:"Source Sans 3", sans-serif;
+    font-weight:600; font-size:.95rem; border-radius:7px;
+    padding:.7rem 1.15rem; transition:transform .15s ease, background .2s ease;
+  }
+  .btn-primary{background:var(--pine); color:var(--parchment);}
+  .btn-primary:hover{background:var(--pine-deep);}
+  .btn:focus-visible, a:focus-visible, input:focus-visible{
+    outline:3px solid var(--rust); outline-offset:2px;
+  }
+  .hero-tags{display:flex; gap:.6rem; flex-wrap:wrap; margin-top:1.6rem;}
+  .hero-tags span{
+    font-family:"Space Mono", monospace; font-size:.72rem; letter-spacing:.06em;
+    background:rgba(251,246,234,.7); border:1px solid var(--line);
+    padding:.3rem .6rem; border-radius:999px; color:var(--pine-deep);
+  }
+
+  /* ---------- Sections ---------- */
+  main{max-width:1180px; margin:0 auto; padding:0 clamp(1.2rem,5vw,3rem);}
+  .section{padding:clamp(3.2rem,7vw,5.5rem) 0; border-top:1px solid var(--line);}
+  .section-head{
+    display:flex; justify-content:space-between; align-items:flex-end;
+    flex-wrap:wrap; gap:1rem; margin-bottom:2.4rem;
+  }
+  .section-head h2{font-size:clamp(1.7rem,3.4vw,2.3rem);}
+  .section-head .note{max-width:34ch; color:var(--ink-soft); font-size:.95rem;}
+
+  .reveal{opacity:0; transform:translateY(16px); transition:opacity .5s ease, transform .5s ease;}
+  .reveal.in{opacity:1; transform:none;}
+
+  /* ---- Card catalog motif (shared) ---- */
+  .stamp{
+    font-family:"Space Mono", monospace;
+    display:inline-flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; text-transform:uppercase; letter-spacing:.05em;
+    border:2px solid var(--rust-deep); border-radius:50%;
+    color:var(--rust-deep); mix-blend-mode:multiply;
+    transform:rotate(-7deg);
+    position:relative;
+  }
+  .stamp::before{
+    content:""; position:absolute; inset:3px;
+    border:1px solid var(--rust-deep); border-radius:50%;
+  }
+
+  /* ---------- Books ---------- */
+  .book-grid{
+    display:grid; gap:1.4rem;
+    grid-template-columns:repeat(auto-fill, minmax(230px,1fr));
+  }
+  .book-card{
+    background:var(--card); border:1px solid var(--line); border-radius:4px;
+    box-shadow:var(--shadow); position:relative; padding:1.5rem 1.2rem 1.3rem;
+    display:flex; flex-direction:column; gap:.55rem;
+    transition:transform .2s ease, box-shadow .2s ease;
+  }
+  .book-card:hover{transform:translateY(-4px); box-shadow:0 14px 30px -14px rgba(42,36,23,.35);}
+  .book-card::before{
+    content:""; position:absolute; top:0; left:22px; width:14px; height:14px;
+    background:var(--parchment); border:1px solid var(--line); border-radius:50%;
+    transform:translateY(-50%);
+  }
+  .book-card::after{
+    content:""; position:absolute; top:14px; left:0; right:0;
+    border-top:1px dashed var(--line);
+  }
+  .book-card .stamp{
+    position:absolute; top:-14px; right:-10px; width:58px; height:58px;
+    font-size:.56rem; z-index:2;
+  }
+  .book-card .tag{
+    font-family:"Space Mono", monospace; font-size:.68rem; letter-spacing:.08em;
+    text-transform:uppercase; color:var(--pine);
+  }
+  .book-card h3{font-size:1.15rem; line-height:1.25; margin-top:.4rem;}
+  .book-card .author{font-size:.88rem; color:var(--ink-soft); font-style:italic;}
+  .book-card p{margin:.3rem 0 0; font-size:.92rem; color:var(--ink-soft);}
+
+  /* ---------- Events ---------- */
+  .event-list{display:flex; flex-direction:column;}
+  .event-row{
+    display:grid; grid-template-columns:88px 1fr; gap:1.4rem;
+    padding:1.3rem 0; border-bottom:1px solid var(--line);
+    align-items:center;
+  }
+  .event-row:first-child{border-top:1px solid var(--line);}
+  .event-row .stamp{width:78px; height:78px; font-size:.62rem; flex:none;}
+  .event-row .stamp .day{font-size:1.3rem; font-weight:700; line-height:1;}
+  .event-body h3{font-size:1.15rem; margin-bottom:.2rem;}
+  .event-meta{
+    display:flex; gap:1rem; flex-wrap:wrap;
+    font-family:"Space Mono", monospace; font-size:.76rem;
+    color:var(--pine); text-transform:uppercase; letter-spacing:.04em;
+    margin-top:.35rem;
+  }
+  .event-body p{margin:.5rem 0 0; color:var(--ink-soft); font-size:.94rem;}
+
+  /* ---------- E-catalog ---------- */
+  .catalog-panel{
+    background:var(--pine-deep); color:var(--parchment);
+    border-radius:10px; padding:clamp(1.8rem,4vw,3rem);
+    display:grid; gap:2.2rem;
+    grid-template-columns:1.1fr .9fr;
+    align-items:center;
+  }
+  .catalog-panel .eyebrow{color:var(--sand);}
+  .catalog-panel .eyebrow::before{background:var(--sand);}
+  .catalog-panel h2{color:var(--parchment); font-size:clamp(1.6rem,3vw,2.1rem); margin-top:.6rem;}
+  .catalog-panel p{color:rgba(241,232,214,.82); max-width:46ch;}
+  .catalog-search{
+    display:flex; gap:.5rem; margin-top:1.4rem; max-width:420px;
+  }
+  .catalog-search input{
+    flex:1; border:none; border-radius:7px; padding:.7rem .8rem;
+    font-family:"Source Sans 3"; font-size:.95rem;
+  }
+  .btn-sand{background:var(--sand); color:var(--pine-deep);}
+  .btn-sand:hover{background:#d9ac6d;}
+  .catalog-actions{display:grid; gap:.9rem;}
+  .catalog-action{
+    background:rgba(251,246,234,.08); border:1px solid rgba(241,232,214,.25);
+    border-radius:8px; padding:1rem 1.1rem;
+    display:flex; align-items:center; gap:.8rem;
+  }
+  .catalog-action svg{width:22px; height:22px; flex:none; color:var(--sand);}
+  .catalog-action .t{font-weight:600; font-size:.95rem;}
+  .catalog-action .d{font-size:.82rem; color:rgba(241,232,214,.7);}
+
+  /* ---------- Contacts ---------- */
+  .contact-grid{
+    display:grid; grid-template-columns:1fr 1fr; gap:2.5rem;
+  }
+  .contact-block h3{font-size:1.05rem; margin-bottom:.5rem;}
+  .contact-line{display:flex; gap:.7rem; margin-bottom:.7rem; align-items:flex-start;}
+  .contact-line svg{width:19px;height:19px;flex:none; color:var(--rust-deep); margin-top:.2rem;}
+  .hours-table{width:100%; border-collapse:collapse; margin-top:.6rem; font-size:.94rem;}
+  .hours-table td{padding:.4rem 0; border-bottom:1px dashed var(--line);}
+  .hours-table td:last-child{text-align:right; font-family:"Space Mono", monospace; font-size:.85rem;}
+  .map-card{
+    background:var(--card); border:1px solid var(--line); border-radius:8px;
+    padding:1.4rem; box-shadow:var(--shadow);
+  }
+  .map-card svg{width:100%; height:auto;}
+  .map-caption{font-size:.85rem; color:var(--ink-soft); margin-top:.7rem;}
+
+  @media (max-width:760px){
+    .catalog-panel{grid-template-columns:1fr;}
+    .contact-grid{grid-template-columns:1fr;}
+  }
+
+  /* ---------- Footer ---------- */
+  footer{
+    border-top:1px solid var(--line);
+    padding:1.8rem clamp(1.2rem,5vw,3rem);
+    display:flex; justify-content:space-between; flex-wrap:wrap; gap:.6rem;
+    font-size:.85rem; color:var(--ink-soft);
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <a href="#sakums" class="brand">
+    <svg class="brand-mark" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M4 9C9 6.5 15 6.5 20 9V32C15 29.5 9 29.5 4 32V9Z" fill="var(--pine)"/>
+      <path d="M36 9C31 6.5 25 6.5 20 9V32C25 29.5 31 29.5 36 32V9Z" fill="var(--rust)"/>
+    </svg>
+    Inčukalna bibliotēka
+  </a>
+  <button class="nav-toggle" id="navToggle" aria-label="Atvērt izvēlni" aria-expanded="false"><span></span></button>
+  <nav class="main-nav" id="mainNav">
+    <a href="#gramatas">Jaunākās grāmatas</a>
+    <a href="#pasakumi">Pasākumi</a>
+    <a href="#katalogs">E-katalogs</a>
+    <a href="#kontakti">Kontakti</a>
+  </nav>
+</header>
+
+<section class="hero" id="sakums">
+  <div class="hero-inner reveal in">
+    <span class="eyebrow">Inčukalna novads</span>
+    <h1>Bibliotēka pie<br>Gaujas smilšakmens klintīm</h1>
+    <p class="lead">Grāmatas, pasākumi un mierīga lasītava ikvienam — no pirmās skolas grāmatas līdz vietējās vēstures arhīvam.</p>
+    <form class="hero-search" role="search" onsubmit="return false;">
+      <input type="text" placeholder="Meklēt grāmatu, autoru vai tēmu…" aria-label="Meklēt katalogā">
+      <button class="btn btn-primary" type="submit">Meklēt</button>
+    </form>
+    <div class="hero-tags">
+      <span>7000+ vienību krājumā</span>
+      <span>Bezmaksas Wi-Fi</span>
+      <span>Bērnu stūrītis</span>
+    </div>
+  </div>
+</section>
+
+<main>
+
+  <!-- JAUNĀKĀS GRĀMATAS -->
+  <section class="section" id="gramatas">
+    <div class="section-head reveal">
+      <div>
+        <span class="eyebrow">Krājuma jaunumi</span>
+        <h2>Jaunākās grāmatas</h2>
+      </div>
+      <p class="note">Šomēnes plauktos — no latviešu prozas jaunumiem līdz dabas grāmatām mazajiem pētniekiem.</p>
+    </div>
+
+    <div class="book-grid">
+      <article class="book-card reveal">
+        <span class="stamp"><span>Jaunums</span></span>
+        <span class="tag">Romāns</span>
+        <h3>Jelgava 94</h3>
+        <span class="author">Jānis Joņevs</span>
+        <p>Deviņdesmito gadu Jelgava — metāla mūzika, draudzība un pieaugšana.</p>
+      </article>
+
+      <article class="book-card reveal">
+        <span class="stamp"><span>Jaunums</span></span>
+        <span class="tag">Romāns</span>
+        <h3>Mātes piens</h3>
+        <span class="author">Nora Ikstena</span>
+        <p>Trīs paaudžu sieviešu stāsts padomju un pēcpadomju Latvijā.</p>
+      </article>
+
+      <article class="book-card reveal">
+        <span class="tag">Bērniem</span>
+        <h3>Kaķīša dzirnavas</h3>
+        <span class="author">Latviešu tautas pasaka</span>
+        <p>Ilustrēts izdevums lasīšanai kopā ar vecākiem no 4 gadu vecuma.</p>
+      </article>
+
+      <article class="book-card reveal">
+        <span class="tag">Luga / dzeja</span>
+        <h3>Pieci pirksti</h3>
+        <span class="author">Māra Zālīte</span>
+        <p>Ģimenes vēstures dramaturģija ar dziļu vēsturisko fonu.</p>
+      </article>
+
+      <article class="book-card reveal">
+        <span class="stamp"><span>Jaunums</span></span>
+        <span class="tag">Detektīvs</span>
+        <h3>Klusā stunda</h3>
+        <span class="author">K. Bergmane</span>
+        <p>Ziemas nakts noslēpums nelielā piekrastes ciematā.</p>
+      </article>
+
+      <article class="book-card reveal">
+        <span class="tag">Dabas grāmata</span>
+        <h3>Latvijas daba tuvplānā</h3>
+        <span class="author">I. Kalniņš</span>
+        <p>Foto grāmata par mežiem, purviem un Gaujas ielejas ainavām.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- BIBLIOTĒKAS PASĀKUMI -->
+  <section class="section" id="pasakumi">
+    <div class="section-head reveal">
+      <div>
+        <span class="eyebrow">Notiek klātienē</span>
+        <h2>Bibliotēkas pasākumi</h2>
+      </div>
+      <p class="note">Nāc uz lasījumiem, darbnīcām un tikšanās vakariem — ieeja visiem pasākumiem ir bez maksas.</p>
+    </div>
+
+    <div class="event-list">
+      <div class="event-row reveal">
+        <span class="stamp"><span class="day">12</span><span>Jūl</span></span>
+        <div class="event-body">
+          <h3>Vasaras lasīšanas izaicinājums bērniem</h3>
+          <div class="event-meta"><span>11:00</span><span>Bērnu stūrītis</span></div>
+          <p>Reģistrēšanās un pirmās lasīšanas kartītes vasaras izaicinājumam 6–12 gadus veciem lasītājiem.</p>
+        </div>
+      </div>
+
+      <div class="event-row reveal">
+        <span class="stamp"><span class="day">18</span><span>Jūl</span></span>
+        <div class="event-body">
+          <h3>Grāmatu kluba tikšanās: "Mātes piens"</h3>
+          <div class="event-meta"><span>18:00</span><span>Lasītava</span></div>
+          <p>Atklāta saruna par romānu — pievienoties var arī tie, kas grāmatu vēl lasa.</p>
+        </div>
+      </div>
+
+      <div class="event-row reveal">
+        <span class="stamp"><span class="day">25</span><span>Jūl</span></span>
+        <div class="event-body">
+          <h3>Radošā darbnīca: grāmatzīmju darināšana</h3>
+          <div class="event-meta"><span>16:00</span><span>Bibliotēkas zāle</span></div>
+          <p>Materiāli būs sagatavoti, jāpaņem līdzi tikai laba oma. Piemērots visām vecuma grupām.</p>
+        </div>
+      </div>
+
+      <div class="event-row reveal">
+        <span class="stamp"><span class="day">02</span><span>Aug</span></span>
+        <div class="event-body">
+          <h3>Tikšanās ar vietējo autoru</h3>
+          <div class="event-meta"><span>17:00</span><span>Bibliotēkas zāle</span></div>
+          <p>Vakars, veltīts Inčukalna novada rakstniekiem un viņu jaunākajiem darbiem.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- E-KATALOGS -->
+  <section class="section" id="katalogs">
+    <div class="catalog-panel reveal">
+      <div>
+        <span class="eyebrow">Piekļuve 24/7</span>
+        <h2>E-katalogs</h2>
+        <p>Meklē krājumā, pārbaudi pieejamību, pagarini termiņu vai rezervē grāmatu — no jebkuras vietas, jebkurā laikā.</p>
+        <form class="catalog-search" role="search" onsubmit="return false;">
+          <input type="text" placeholder="Grāmatas nosaukums vai autors…" aria-label="Meklēt e-katalogā">
+          <button class="btn btn-sand" type="submit">Meklēt</button>
+        </form>
+      </div>
+      <div class="catalog-actions">
+        <div class="catalog-action">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          <div><div class="t">Meklēt grāmatu</div><div class="d">Pārbaudi, vai izdevums ir plauktā</div></div>
+        </div>
+        <div class="catalog-action">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>
+          <div><div class="t">Pagarināt termiņu</div><div class="d">Vienā klikšķī pagarini lasīšanas laiku</div></div>
+        </div>
+        <div class="catalog-action">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19.5A2.5 2.5 0 016.5 17H20V4H6.5A2.5 2.5 0 004 6.5v13z"/></svg>
+          <div><div class="t">Rezervēt izdevumu</div><div class="d">Saņem paziņojumu, kad grāmata brīva</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- KONTAKTI -->
+  <section class="section" id="kontakti">
+    <div class="section-head reveal">
+      <div>
+        <span class="eyebrow">Atrodi mūs</span>
+        <h2>Kontakti</h2>
+      </div>
+      <p class="note">Iegriezies ciemos — esam gandrīz katru dienu, izņemot svētdienas.</p>
+    </div>
+
+    <div class="contact-grid">
+      <div class="reveal">
+        <div class="contact-block">
+          <h3>Adrese un saziņa</h3>
+          <div class="contact-line">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s7-6.5 7-12a7 7 0 10-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/></svg>
+            <span>Atmodas iela 3, Inčukalns, Inčukalna pagasts,<br>Siguldas novads, LV-2141</span>
+          </div>
+          <div class="contact-line">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1.9.3 1.8.6 2.7a2 2 0 01-.5 2.1L8 9.7a16 16 0 006.3 6.3l1.2-1.2a2 2 0 012.1-.5c.9.3 1.8.5 2.7.6a2 2 0 011.7 2z"/></svg>
+            <span>+371 6797 xxxx</span>
+          </div>
+          <div class="contact-line">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 6l10 7L22 6"/></svg>
+            <span>biblioteka@incukalns.lv</span>
+          </div>
+
+          <h3 style="margin-top:1.6rem;">Darba laiks</h3>
+          <table class="hours-table">
+            <tr><td>Pirmdiena – Piektdiena</td><td>10:00–18:00</td></tr>
+            <tr><td>Sestdiena</td><td>10:00–15:00</td></tr>
+            <tr><td>Svētdiena</td><td>Slēgts</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="map-card reveal">
+        <svg viewBox="0 0 320 220" xmlns="http://www.w3.org/2000/svg">
+          <rect width="320" height="220" rx="6" fill="var(--parchment)"/>
+          <path d="M0 60 C 60 40, 120 80, 180 55 S 300 30, 320 50" stroke="var(--sand)" stroke-width="10" fill="none" opacity=".6"/>
+          <path d="M0 150 C 80 130, 140 170, 220 150 S 300 160, 320 145" stroke="var(--pine)" stroke-width="6" fill="none" opacity=".35"/>
+          <line x1="20" y1="10" x2="60" y2="210" stroke="var(--ink)" stroke-opacity=".15" stroke-width="4"/>
+          <line x1="140" y1="0" x2="120" y2="220" stroke="var(--ink)" stroke-opacity=".1" stroke-width="3"/>
+          <g transform="translate(168,95)">
+            <path d="M0 0C0-16 13-28 24-28s24 12 24 28c0 18-24 42-24 42S0 18 0 0Z" fill="var(--rust)"/>
+            <circle cx="24" cy="-14" r="9" fill="var(--card)"/>
+          </g>
+        </svg>
+        <p class="map-caption">Netālu no Vulkānu ielas smilšakmens atsegumiem un Gaujas — ērti sasniedzams kājāmejot vai ar autobusu.</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <span>© 2026 Inčukalna bibliotēka</span>
+  <span>Vieta stāstiem, klusumam un jauniem atklājumiem.</span>
+</footer>
+
+<script>
+  // mobile nav toggle
+  const toggle = document.getElementById('navToggle');
+  const nav = document.getElementById('mainNav');
+  toggle.addEventListener('click', () => {
+    const open = nav.classList.toggle('open');
+    toggle.setAttribute('aria-expanded', open);
+  });
+  nav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+    nav.classList.remove('open');
+    toggle.setAttribute('aria-expanded', 'false');
+  }));
+
+  // active link highlight
+  const links = document.querySelectorAll('.main-nav a');
+  const sections = ['gramatas','pasakumi','katalogs','kontakti'].map(id => document.getElementById(id));
+  const spy = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if(e.isIntersecting){
+        links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + e.target.id));
+      }
+    });
+  }, {rootMargin: '-40% 0px -50% 0px'});
+  sections.forEach(s => s && spy.observe(s));
+
+  // scroll reveal
+  const revealEls = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, {threshold:.15});
+  revealEls.forEach(el => io.observe(el));
+</script>
+
+</body>
+</html>
